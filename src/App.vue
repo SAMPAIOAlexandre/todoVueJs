@@ -13,6 +13,7 @@ const todos = ref([
 	},
 ]);
 const newTodo = ref("");
+const isEditing = ref(null);
 const addTodo = () => {
 	todos.value.push({
 		title: newTodo.value,
@@ -29,6 +30,17 @@ const orderedTodo = () => {
 const deleteTodo = (id) => {
 	todos.value = todos.value.filter((todo) => todo.data !== id);
 };
+
+const editTodo = (id) => {
+	isEditing.value = id;
+};
+const saveTodo = (id, newTitle) => {
+	const task = todos.value.find((todo) => todo.data === id);
+	if (task) {
+		task.title = newTitle;
+		isEditing.value = null;
+	}
+};
 </script>
 
 <template>
@@ -39,21 +51,26 @@ const deleteTodo = (id) => {
     <input type="text"
     placeholder="Tâche à ajouter"
     v-model="newTodo">
-    <!-- Ici j'utilise disabled si le champ ajouter une tâche est video le button est bloqué -->
+    <!-- Ici j'utilise disabled si le champ ajouter une tâche est vide le button est bloqué -->
     <button :disabled="newTodo.length === 0">Ajouter la tâche</button>
     </fieldset>
     </form>
     <div v-if="todos.length === 0"> Aucune tâche à faire </div>
     <div v-else>
       <ul>
-        <li v-for="todo in orderedTodo()"
-        :key="todo.date">
-        {{ todo.title }}
-        <label>
-          <input type="checkbox" v-model="todo.completed">
-          
-          <button @click="deleteTodo(todo.data)">Supprimer</button>
-        </label>
+        <li v-for="todo in orderedTodo()" :key="todo.data">
+          <div v-if="isEditing === todo.data">
+            <input v-model="todo.title" />
+            <button @click="saveTodo(todo.data, todo.title)">Sauvegarder</button>
+          </div>
+          <div v-else>
+            {{ todo.title }}
+            <label>
+              <input type="checkbox" v-model="todo.completed" />
+              <button @click="editTodo(todo.data)">Editer</button>
+              <button @click="deleteTodo(todo.data)">Supprimer</button>
+            </label>
+          </div>
         </li>
       </ul>  
   
