@@ -79,4 +79,3 @@ const saveTodo = (id, newTitle) => {
 
 </template>
 
-
